@@ -1,4 +1,4 @@
-package labs.lab1;
+package labs.lab1.task1;
 
 public class Transaction {
 
