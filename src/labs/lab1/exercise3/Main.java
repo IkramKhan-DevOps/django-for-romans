@@ -11,7 +11,8 @@ public class Main {
         System.out.println("color is: " + c4.getColor());
 
         // returns description about the instance
-        System.out.println(c4.toString());
+        System.out.println(c4.toString()); //explicit call
+        System.out.println(c4); //implicit call
 
     }
 }
