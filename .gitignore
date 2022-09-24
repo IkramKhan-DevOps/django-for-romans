@@ -155,3 +155,4 @@ dmypy.json
 migrations/
 
 .vscode/
+.vs/
