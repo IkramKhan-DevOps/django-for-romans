@@ -1,0 +1,16 @@
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6 col-xl-6">
+        <div class="text-center">
+            <p class="mb-0">
+                <b>
+                    <a href="/"><i class="bx bx-home"></i> Home</a> &nbsp;-&nbsp;
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'accounts:cross-auth' %}"><i class="bx bxs-dashboard"></i> Dashboard</a>
+                    {% else %}
+                        <a href="{% url 'accounts:cross-auth' %}"><i class="bx bx-lock-open"></i> Login</a>
+                    {% endif %}
+                </b>
+            </p>
+        </div>
+    </div>
+</div>

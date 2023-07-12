@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign Up Closed" %}{% endblock %}
+
+{% block dont_include_details %}
+
+    <div class="account-pages my-5 pt-sm-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 col-xl-6">
+                    <div class="card shadow">
+
+                        <h1>{% trans "Sign Up Closed" %}</h1>
+                        <p>{% trans "We are sorry, but the sign up is currently closed." %}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'include/global-short-footer.html' %}
+
+        </div>
+    </div>
+{% endblock %}

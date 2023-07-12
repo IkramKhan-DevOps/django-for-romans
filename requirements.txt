@@ -1,0 +1,16 @@
+six
+Faker
+pillow
+markdown
+python-dateutil
+
+django
+django-environ
+django-filter
+django-allauth
+django-resized
+python-decouple
+django-ckeditor
+django-crispy-forms
+
+django-browser-reload
