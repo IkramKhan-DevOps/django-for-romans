@@ -17,6 +17,7 @@ application detailed down description here
 2. Administration
 3. Staff Management
 4. Root Administration
+5. Django-payments
 
 # Tools and Technologies
 
