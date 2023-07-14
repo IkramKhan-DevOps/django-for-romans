@@ -1,0 +1,24 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "username": "staff",
+      "password": "poiuyt0987654",
+      "email": "active@exarth.com",
+      "is_staff": true,
+      "is_active": true
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "username": "active",
+      "password": "poiuyt0987654",
+      "email": "active@exarth.com",
+      "is_staff": false,
+      "is_active": true
+    }
+  }
+]

@@ -14,7 +14,9 @@ environ.Env.read_env(BASE_DIR / '.env')
 DEBUG = True
 ROOT_URLCONF = 'core.urls'
 AUTH_USER_MODEL = 'accounts.User'
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/cross-auth/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
 
     # STARTER APPS
     'crispy_forms',
+    'crispy_bootstrap5',
     'ckeditor',
     'django_filters',
 
@@ -162,7 +165,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 FIXTURE_DIRS = [
     'fixtures',
 ]
-
 
 """ RESIZER IMAGE --------------------------------------------------------------------------------"""
 DJANGORESIZED_DEFAULT_SIZE = [1920, 1080]

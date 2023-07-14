@@ -11,6 +11,6 @@ django-allauth
 django-resized
 python-decouple
 django-ckeditor
-django-crispy-forms
-
 django-browser-reload
+django-crispy-forms
+crispy-bootstrap5
