@@ -16,7 +16,7 @@ ROOT_URLCONF = 'core.urls'
 AUTH_USER_MODEL = 'accounts.User'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
-
+DOMAIN = env('DOMAIN')
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/accounts/cross-auth/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'ckeditor',
     'django_filters',
+    'payments',
 
     # WEB APPS
     'allauth',
@@ -57,10 +58,13 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'drf_yasg',
 
-    # YOUR APPS
+    # MY APPS
     'src.global.apps.GlobalConfig',
     'src.accounts.apps.AccountsConfig',
-    'src.administration.admins.apps.AdministrationAdminConfig'
+    'src.administration.admins.apps.AdministrationAdminConfig',
+
+    # REQUIRED APPS
+    'src.apps.app_payments.apps.PaymentsConfig',
 ]
 
 MIDDLEWARE = [
@@ -137,6 +141,26 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+""" PAYMENTS SETTINGS """
+PAYMENT_HOST = DOMAIN  # 'localhost:8000'
+PAYMENT_USES_SSL = False
+# PAYMENT_VARIANT_FACTORY = "mypaymentapp.provider_factory" -- check docsfor more details
+PAYMENT_SUCCESS_URL = ''
+PAYMENT_FAILURE_URL = ''
+PAYMENT_MODEL = 'app_payments.Payment'
+# PAYMENTS_STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+# PAYMENTS_STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+PAYMENT_VARIANTS = {
+    'default': ('payments.dummy.DummyProvider', {}),
+    'stripe': (
+        'payments.stripe.StripeProvider',
+        {
+            'secret_key': 'sk_test_123456',
+            'public_key': 'pk_test_123456',
+        }
+    )
+}
 
 """ INTERNATIONALIZATION --------------------------------------------------------------------------------"""
 LANGUAGE_CODE = 'en-us'

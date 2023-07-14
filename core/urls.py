@@ -21,8 +21,12 @@ handler500 = handler500
 # EXTERNAL APPS URLS ---------------------------------------------------------------------------------------------------
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('accounts/', include('src.accounts.urls', namespace='accounts')),
     path('accounts/', include('allauth.urls')),
+
+    path('payments/', include('payments.urls')),
+    path('payments/', include('src.apps.app_payments.urls', namespace='payments')),
 ]
 
 # DJANGO REST-FRAMEWORK URLS -------------------------------------------------------------------------------------------

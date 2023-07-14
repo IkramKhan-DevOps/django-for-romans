@@ -14,3 +14,7 @@ django-ckeditor
 django-browser-reload
 django-crispy-forms
 crispy-bootstrap5
+
+# PAYMENTS
+django-payments
+django-payments[stripe]
