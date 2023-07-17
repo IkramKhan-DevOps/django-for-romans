@@ -1,80 +1,117 @@
-from decimal import Decimal
-
-from django.shortcuts import get_object_or_404, redirect
-from django.template.response import TemplateResponse
+from django.conf import settings
+from django.contrib import messages
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.views import View
-from payments import get_payment_model, RedirectNeeded
-from payments.forms import PaymentForm, CreditCardPaymentForm
 
-from src.apps.app_payments.models import Payment
+import stripe
+from payments import PaymentStatus
+
+from .bll import create_waiting_payment
+from .models import Payment
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-class PaymentCreateView(View):
+def get_delivery_amount():
+    return 0
+
+
+def get_tax_amount():
+    return 0
+
+
+def get_total_amount():
+    return 0
+
+
+def get_capture_amount():
+    return 0
+
+
+def get_amounts():
+    return get_total_amount() or 0, get_capture_amount() or 0,  get_delivery_amount() or 0, get_tax_amount() or 0
+
+
+class CheckoutView(View):
 
     def get(self, request):
+        payment = create_waiting_payment(10, 10, 0, 0, "usd")
+        context = {'payment': payment}
+        return render(request, "app_payments/checkout.html", context)
 
-        form = CreditCardPaymentForm()
 
-        return TemplateResponse(
-            request,
-            'app_payments/payment.html',
-            {'form': form}
+class CheckoutProcessView(View):
+
+    def get(self, request, pk):
+        """
+        complete checkout process for stripe only
+        """
+
+        # 1: get values
+        host = self.request.get_host()
+        total, capture, delivery, tax = get_amounts()
+        # 2: get payment [pre auth]
+        payment = get_object_or_404(Payment, id=pk)
+
+        # 3: create checkout session
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": payment.currency,
+                        "unit_amount": int(payment.captured_amount * 100),
+                        "product_data": {
+                            "name": "Product Name",
+                        },
+                    },
+                    "quantity": 1,
+                },
+            ],
+            mode="payment",
+            success_url='http://' + host + reverse('payments:payment_success') \
+                        + '?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url='http://{}{}'.format(host, reverse(
+                'payments:payment_failure')),
         )
 
-    def post(self, request):
-        form = CreditCardPaymentForm(request.POST)
-        if form.is_valid():
+        # 4: save session adn payments [pre auth]
+        session_id = checkout_session['id']
+        payment.transaction_id = session_id
+        payment.status = PaymentStatus.PREAUTH
+        payment.save()
 
-            payment = Payment.objects.create(
-                variant='default',  # this is the variant from PAYMENT_VARIANTS
-                description='Book purchase',
-                total=Decimal(120),
-                tax=Decimal(20),
-                currency='USD',
-                delivery=Decimal(10),
-                billing_first_name='Sherlock',
-                billing_last_name='Holmes',
-                billing_address_1='221B Baker Street',
-                billing_address_2='',
-                billing_city='London',
-                billing_postcode='NW1 6XE',
-                billing_country_code='GB',
-                billing_country_area='Greater London',
-                customer_ip_address='127.0.0.1',
-            )
-
-            # 2: capture the payments from client
-            try:
-                payment.capture()  # Perform the payment processing
-
-                # Perform additional actions with the payment object if needed
-                # For example, update the order status, generate an invoice, etc.
-                # Redirect to the confirmation page
-                print("everything is done")
-                return redirect('confirmation', payment_id=payment.pk)
-            except RedirectNeeded as redirect_to:
-                return redirect(str(redirect_to))
-            except Exception as e:
-                print(e)
-                return print(e)
-
-        return TemplateResponse(
-            request,
-            'app_payments/payment.html',
-            {'form': form}
-        )
+        # 5: redirect to check out session url
+        return redirect(checkout_session.url, code=303)
 
 
-def payment_details(request, payment_id):
-    payment = get_object_or_404(get_payment_model(), id=payment_id)
+class PaymentSuccessView(View):
+    def get(self, request):
+        session_id = request.GET.get("session_id")
+        try:
+            payment = Payment.objects.get(transaction_id=session_id)
+        except Payment.DoesNotExist:
+            messages.error(request, "Payment record not found")
+            return redirect("payments:payment_failure")
 
-    try:
-        form = payment.get_form(data=request.POST or None)
-    except RedirectNeeded as redirect_to:
-        return redirect(str(redirect_to))
+        payment.status = PaymentStatus.CONFIRMED
+        payment.save()
 
-    return TemplateResponse(
-        request,
-        'app_payments/payment.html',
-        {'form': form, 'payment': payment}
-    )
+        return render(request, "app_payments/success.html")
+
+
+class PaymentFailureView(View):
+    def get(self, request):
+        session_id = request.GET.get("session_id")
+
+        try:
+            payment = Payment.objects.get(transaction_id=session_id)
+        except Payment.DoesNotExist:
+            return render(request, "app_payments/failure.html")
+
+        payment.status = PaymentStatus.ERROR
+        payment.save()
+
+        return render(request, "app_payments/failure.html")

@@ -1,9 +1,14 @@
 from django.contrib import admin
 from django.urls import path
-from .views import payment_details, PaymentCreateView
+
+from src.apps.app_payments.views import CheckoutView, PaymentSuccessView, PaymentFailureView, CheckoutProcessView
 
 app_name = "payments"
 urlpatterns = [
-    path('<int:pk>/detail/', payment_details, name='payment_details'),
-    path('create/', PaymentCreateView.as_view(), name='payment_create'),
+
+    path("checkout/", CheckoutView.as_view(), name="checkout"),
+    path("checkout/<int:pk>/process/", CheckoutProcessView.as_view(), name="checkout_process"),
+    path("success/", PaymentSuccessView.as_view(), name="payment_success"),
+    path("failure/", PaymentFailureView.as_view(), name="payment_failure"),
+
 ]

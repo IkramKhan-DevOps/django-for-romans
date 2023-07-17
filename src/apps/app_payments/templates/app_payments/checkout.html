@@ -1,0 +1,8 @@
+<!-- checkout.html -->
+{% extends "app_payments/base.html" %}
+
+{% block content %}
+    <h1 class="text-center">Checkout</h1>
+    <p class="text-center">Click the button below to proceed with checkout.</p>
+    <a href="{% url 'payments:checkout_process' payment.pk %}" class="btn btn-primary">Proceed to Checkout</a>
+{% endblock %}

@@ -7,7 +7,6 @@ from django.db import models
 
 
 class Payment(BasePayment):
-    # order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     def get_host_url(self) -> str:
         protocol = 'https://' if PAYMENT_USES_SSL else 'http://'
